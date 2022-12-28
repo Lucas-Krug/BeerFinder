@@ -36,25 +36,25 @@ jobs:
 
   buildDebug:
     runs-on: ubuntu-latest
-      needs: unitTest
-      steps:
-        - uses: actions/checkout@v2
+    needs: unitTest
+    steps:
+      - uses: actions/checkout@v2
 
-        - name: Set up ruby env
-          uses: ruby/setup-ruby@v1
-          with:
-            ruby-version: 2.7.2
-            bundler-cache: true
+      - name: Set up ruby env
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.7.2
+          bundler-cache: true
 
-        - name: Build Debug apk
-          run: bundle exec fastlane buildDebug
+      - name: Build Debug apk
+        run: bundle exec fastlane buildDebug
 
-        - name: Upload build artifacts
-            uses: actions/upload-artifact@v2
-            with:
-              name: assets
-              path: |
-                ${{ github.workspace }}/app/build/outputs/apk/debug/app-debug.apk
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: assets
+          path: |
+            ${{ github.workspace }}/app/build/outputs/apk/debug/app-debug.apk
 
   buildRelease:
     if: ${{ github.ref == 'refs/heads/main' }}
