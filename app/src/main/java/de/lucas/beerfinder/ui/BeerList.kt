@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -26,14 +27,19 @@ import de.lucas.beerfinder.ui.LoadingState.FINISHED
 import de.lucas.beerfinder.ui.theme.Typography
 
 @Composable
-fun BeerList(beers: List<Beer>, state: LoadingState, onClickRetry: () -> Unit) {
+fun BeerList(
+    beers: List<Beer>,
+    state: LoadingState,
+    onClickBeer: (beer: Beer) -> Unit,
+    onClickRetry: () -> Unit
+) {
     if (beers.isNotEmpty() && state == FINISHED) {
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             contentPadding = PaddingValues(all = 8.dp),
             content = {
                 items(beers.size) { index ->
-                    BeerItem(beer = beers[index])
+                    BeerItem(beer = beers[index], onClickBeer)
                 }
             }
         )
@@ -42,13 +48,15 @@ fun BeerList(beers: List<Beer>, state: LoadingState, onClickRetry: () -> Unit) {
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun BeerItem(beer: Beer) {
+fun BeerItem(beer: Beer, onClickBeer: (beer: Beer) -> Unit) {
     Card(
         elevation = 8.dp,
         modifier = Modifier
             .padding(8.dp)
-            .aspectRatio(0.7f)
+            .aspectRatio(0.7f),
+        onClick = { onClickBeer(beer) }
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -109,6 +117,8 @@ fun PreviewBeerList() {
                 ),
                 foodPairing = listOf()
             )
-        ), FINISHED
+        ),
+        FINISHED,
+        {}
     ) {}
 }

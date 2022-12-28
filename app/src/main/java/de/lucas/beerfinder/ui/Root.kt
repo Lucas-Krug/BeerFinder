@@ -1,22 +1,30 @@
 package de.lucas.beerfinder.ui
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import de.lucas.beerfinder.R
+import de.lucas.beerfinder.model.Beer
+import de.lucas.beerfinder.ui.NavItem.BEER_DETAILS
 import de.lucas.beerfinder.ui.NavItem.BEER_LIST
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import java.net.URLEncoder
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun Root() {
     val navController = rememberNavController()
@@ -24,6 +32,14 @@ fun Root() {
 
     Scaffold(topBar = {
         TopAppBar {
+            if (rootViewModel.showBackNavButton) {
+                IconButton(onClick = { navController.popBackStack() }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_arrow_back),
+                        contentDescription = ""
+                    )
+                }
+            }
             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
                 Text(
                     text = rootViewModel.title,
@@ -33,21 +49,33 @@ fun Root() {
                 )
             }
         }
-    }) {
-        NavHost(navController = navController, startDestination = BEER_LIST.route) {
+    }) { innerPadding ->
+        NavHost(
+            navController = navController,
+            startDestination = BEER_LIST.route,
+            modifier = Modifier.padding(innerPadding)
+        ) {
             composable(BEER_LIST.route) { stackEntry ->
+                rootViewModel.showBackNavButton = BEER_LIST.isNavBackEnabled
                 rootViewModel.title = BEER_LIST.title
                 val model: BeerListViewModel = hiltViewModel(stackEntry)
                 LaunchedEffect(model) {
-                    model.fetchBeerList(
-                        onLoading = { rootViewModel.state = LoadingState.LOADING },
-                        onFinished = { rootViewModel.state = LoadingState.FINISHED },
-                        onError = { rootViewModel.state = LoadingState.ERROR }
-                    )
+                    if (model.beerList.isEmpty()) {
+                        model.fetchBeerList(
+                            onLoading = { rootViewModel.state = LoadingState.LOADING },
+                            onFinished = { rootViewModel.state = LoadingState.FINISHED },
+                            onError = { rootViewModel.state = LoadingState.ERROR }
+                        )
+                    }
                 }
                 BeerList(
-                    beers = model.beerlist,
+                    beers = model.beerList,
                     state = rootViewModel.state,
+                    onClickBeer = { beer ->
+                        val jsonBeer =
+                            URLEncoder.encode(Json.encodeToString(beer), "UTF-8").replace("+", " ")
+                        navController.navigate("${BEER_DETAILS.route}/${jsonBeer}")
+                    },
                     onClickRetry = {
                         model.fetchBeerList(
                             onLoading = { rootViewModel.state = LoadingState.LOADING },
@@ -56,6 +84,18 @@ fun Root() {
                         )
                     }
                 )
+            }
+            composable(
+                "${BEER_DETAILS.route}/{beer}",
+                arguments = listOf(navArgument("beer")
+                { type = NavType.StringType })
+            ) { backStackEntry ->
+                rootViewModel.showBackNavButton = BEER_DETAILS.isNavBackEnabled
+                rootViewModel.title = BEER_DETAILS.title
+                backStackEntry.arguments?.getString("beer").let { json ->
+                    val beer = Json.decodeFromString<Beer>(json!!)
+                    BeerDetails(beer = beer)
+                }
             }
         }
     }

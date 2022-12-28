@@ -11,6 +11,7 @@ import javax.inject.Inject
 class RootViewModel @Inject constructor() : ViewModel() {
     var state by mutableStateOf(LoadingState.LOADING)
     var title by mutableStateOf("")
+    var showBackNavButton by mutableStateOf(false)
 }
 
 enum class LoadingState {

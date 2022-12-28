@@ -16,20 +16,7 @@ class BeerListViewModel @Inject constructor(
     private val beerController: BeerController
 ) : ViewModel() {
 
-    private val defaultBeer = listOf(
-        Beer(
-            0,
-            "",
-            "",
-            "",
-            "",
-            "",
-            Beer.Ingredients(listOf(), listOf(), ""),
-            listOf()
-        )
-    )
-
-    var beerlist by mutableStateOf(defaultBeer)
+    var beerList by mutableStateOf(listOf<Beer>())
         private set
 
     fun fetchBeerList(
@@ -38,7 +25,7 @@ class BeerListViewModel @Inject constructor(
         onError: () -> Unit
     ) {
         viewModelScope.launch {
-            beerlist = beerController.fetchBeerList(onLoading, onFinished, onError) ?: defaultBeer
+            beerList = beerController.fetchBeerList(onLoading, onFinished, onError) ?: listOf()
         }
     }
 }
