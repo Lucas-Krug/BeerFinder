@@ -2,10 +2,9 @@ package de.lucas.beerfinder.ui
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -29,27 +28,32 @@ import java.net.URLEncoder
 fun Root() {
     val navController = rememberNavController()
     val rootViewModel: RootViewModel = hiltViewModel()
+    val context = LocalContext.current
+    var showErrorMessage by remember { mutableStateOf(false) }
+    val scaffoldState: ScaffoldState = rememberScaffoldState()
 
-    Scaffold(topBar = {
-        TopAppBar {
-            if (rootViewModel.showBackNavButton) {
-                IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_arrow_back),
-                        contentDescription = ""
+    Scaffold(
+        scaffoldState = scaffoldState,
+        topBar = {
+            TopAppBar {
+                if (rootViewModel.showBackNavButton) {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_arrow_back),
+                            contentDescription = ""
+                        )
+                    }
+                }
+                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
+                    Text(
+                        text = rootViewModel.title,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.padding(start = 8.dp)
                     )
                 }
             }
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
-                Text(
-                    text = rootViewModel.title,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier.padding(start = 8.dp)
-                )
-            }
-        }
-    }) { innerPadding ->
+        }) { innerPadding ->
         NavHost(
             navController = navController,
             startDestination = BEER_LIST.route,
@@ -76,13 +80,14 @@ fun Root() {
                             URLEncoder.encode(Json.encodeToString(beer), "UTF-8").replace("+", " ")
                         navController.navigate("${BEER_DETAILS.route}/${jsonBeer}")
                     },
-                    onClickRetry = {
+                    onClickLoad = {
                         model.fetchBeerList(
                             onLoading = { rootViewModel.state = LoadingState.LOADING },
                             onFinished = { rootViewModel.state = LoadingState.FINISHED },
                             onError = { rootViewModel.state = LoadingState.ERROR }
                         )
-                    }
+                    },
+                    onError = { showErrorMessage = true }
                 )
             }
             composable(
@@ -99,7 +104,14 @@ fun Root() {
             }
         }
     }
-    if (rootViewModel.state == LoadingState.LOADING) {
-        LoadingIndicator()
+    if (showErrorMessage) {
+        LaunchedEffect(rootViewModel) {
+            scaffoldState.snackbarHostState.showSnackbar(
+                message = context.getString(R.string.error_message),
+                duration = SnackbarDuration.Short
+            )
+            showErrorMessage = false
+            rootViewModel.state = LoadingState.FINISHED
+        }
     }
 }
