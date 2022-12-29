@@ -16,7 +16,10 @@ class BeerListViewModel @Inject constructor(
     private val beerController: BeerController
 ) : ViewModel() {
 
-    var beerList by mutableStateOf(listOf<Beer>())
+    var beerList by mutableStateOf(mutableListOf<Beer>())
+        private set
+
+    var page by mutableStateOf(1)
         private set
 
     fun fetchBeerList(
@@ -25,7 +28,29 @@ class BeerListViewModel @Inject constructor(
         onError: () -> Unit
     ) {
         viewModelScope.launch {
-            beerList = beerController.fetchBeerList(onLoading, onFinished, onError) ?: listOf()
+            if (beerList.isEmpty()) {
+                beerList =
+                    beerController.fetchBeerList(
+                        page = page,
+                        onLoading = onLoading,
+                        onFinished = { nextPage ->
+                            page = nextPage
+                            onFinished()
+                        },
+                        onError = onError
+                    )?.toMutableList() ?: mutableListOf()
+            } else {
+                val newBeerList = beerController.fetchBeerList(
+                    page = page,
+                    onLoading = onLoading,
+                    onFinished = { nextPage ->
+                        page = nextPage
+                        onFinished()
+                    },
+                    onError = onError
+                )?.toMutableList() ?: mutableListOf()
+                beerList.addAll(newBeerList)
+            }
         }
     }
 }
