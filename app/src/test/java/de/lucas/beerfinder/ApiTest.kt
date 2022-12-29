@@ -42,8 +42,9 @@ class ApiTest {
             )
         )
         var state = LoadingState.FINISHED
-        coEvery { apiClient.fetchBeerList() }.returns(beer)
+        coEvery { apiClient.fetchBeerList(1) }.returns(beer)
         val response = beerController.fetchBeerList(
+            page = 1,
             onLoading = { state = LoadingState.LOADING },
             onFinished = { state = LoadingState.FINISHED },
             onError = { state = LoadingState.ERROR }
@@ -55,8 +56,9 @@ class ApiTest {
     @Test
     fun testNoInternetConnection() = runBlocking {
         var state = LoadingState.FINISHED
-        coEvery { apiClient.fetchBeerList() }.throws(Exception())
+        coEvery { apiClient.fetchBeerList(1) }.throws(Exception())
         beerController.fetchBeerList(
+            page = 1,
             onLoading = { state = LoadingState.LOADING },
             onFinished = { state = LoadingState.FINISHED },
             onError = { state = LoadingState.ERROR }
