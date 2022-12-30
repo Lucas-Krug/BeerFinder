@@ -12,7 +12,7 @@ data class Beer(
     val firstBrewed: String,
     val description: String,
     @SerialName("image_url")
-    val imageUrl: String,
+    val imageUrl: String?,
     val ingredients: Ingredients,
     @SerialName("food_pairing")
     val foodPairing: List<String>

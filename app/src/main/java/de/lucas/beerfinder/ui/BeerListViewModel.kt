@@ -53,4 +53,13 @@ class BeerListViewModel @Inject constructor(
             }
         }
     }
+
+    fun fetchRandomBeer(onFinished: (Beer) -> Unit, onError: () -> Unit) {
+        viewModelScope.launch {
+            beerController.fetchRandomBeer(
+                onFinished = { beer -> onFinished(beer) },
+                onError = onError
+            )
+        }
+    }
 }

@@ -30,6 +30,7 @@ fun BeerList(
     state: LoadingState,
     onClickBeer: (beer: Beer) -> Unit,
     onClickLoad: () -> Unit,
+    onClickRandom: () -> Unit,
     onError: () -> Unit
 ) {
     Box(contentAlignment = Alignment.Center) {
@@ -49,9 +50,26 @@ fun BeerList(
                                     Button(
                                         onClick = onClickLoad,
                                         shape = RoundedCornerShape(50),
-                                        modifier = Modifier.padding(top = 16.dp, bottom = 16.dp)
+                                        modifier = Modifier
+                                            .padding(top = 16.dp, bottom = 16.dp)
+                                            .height(40.dp)
+                                            .width(124.dp)
                                     ) {
                                         Text(text = stringResource(id = R.string.load_more))
+                                    }
+                                    Text(
+                                        text = stringResource(id = R.string.random_title),
+                                        style = Typography.caption
+                                    )
+                                    Button(
+                                        onClick = onClickRandom,
+                                        shape = RoundedCornerShape(50),
+                                        modifier = Modifier
+                                            .padding(top = 4.dp, bottom = 16.dp)
+                                            .height(40.dp)
+                                            .width(124.dp)
+                                    ) {
+                                        Text(text = stringResource(id = R.string.surprise_me))
                                     }
                                 }
                             } else {
@@ -94,6 +112,7 @@ fun BeerItem(beer: Beer, onClickBeer: (beer: Beer) -> Unit) {
                     .crossfade(true)
                     .build(),
                 placeholder = painterResource(R.drawable.ic_downloading),
+                error = painterResource(id = R.drawable.ic_no_image),
                 contentDescription = "",
                 modifier = Modifier.size(80.dp)
             )
@@ -128,7 +147,7 @@ fun LoadingIndicator() {
 @Composable
 fun PreviewBeerList() {
     BeerList(
-        listOf(
+        beers = listOf(
             Beer(
                 id = 1,
                 name = "Buzz",
@@ -144,7 +163,10 @@ fun PreviewBeerList() {
                 foodPairing = listOf()
             )
         ),
-        FINISHED,
-        {}, {}
-    ) {}
+        state = FINISHED,
+        onClickBeer = {},
+        onClickLoad = {},
+        onClickRandom = {},
+        onError = {}
+    )
 }

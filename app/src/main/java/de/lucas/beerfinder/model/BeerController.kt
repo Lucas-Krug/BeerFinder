@@ -26,4 +26,14 @@ class BeerController @Inject constructor(private val apiClient: ApiClient) {
             null
         }
     }
+
+    suspend fun fetchRandomBeer(onFinished: (Beer) -> Unit, onError: () -> Unit): Beer? {
+        return try {
+            apiClient.fetchRandomBeer().first().apply { onFinished(this) }
+        } catch (exception: Exception) {
+            onError()
+            Timber.e(exception)
+            null
+        }
+    }
 }

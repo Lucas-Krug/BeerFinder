@@ -11,4 +11,7 @@ interface ApiService {
         @Query("page") page: Int,
         @Query("per_page") perPage: Int
     ): List<Beer>
+
+    @GET("beers/random")
+    suspend fun fetchRandomBeer(): List<Beer>
 }
