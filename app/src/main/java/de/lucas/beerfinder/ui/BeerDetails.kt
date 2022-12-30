@@ -38,6 +38,7 @@ fun BeerDetails(beer: Beer) {
     ) {
         AsyncImage(
             model = beer.imageUrl,
+            error = painterResource(id = R.drawable.ic_no_image),
             contentDescription = "",
             modifier = Modifier
                 .weight(1f)

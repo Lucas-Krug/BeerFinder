@@ -9,4 +9,6 @@
     <string name="hops">Hops</string>
     <string name="yeast">Yeast</string>
     <string name="load_more">Load More</string>
+    <string name="surprise_me">Surprise Me</string>
+    <string name="random_title">Don\'t know what to try next?</string>
 </resources>

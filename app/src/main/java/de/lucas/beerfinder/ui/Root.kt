@@ -87,7 +87,21 @@ fun Root() {
                             onError = { rootViewModel.state = LoadingState.ERROR }
                         )
                     },
-                    onError = { showErrorMessage = true }
+                    onError = { showErrorMessage = true },
+                    onClickRandom = {
+                        model.fetchRandomBeer(
+                            onFinished = { beer ->
+                                val jsonBeer =
+                                    URLEncoder.encode(
+                                        Json.encodeToString(beer),
+                                        "UTF-8"
+                                    )
+                                        .replace("+", " ")
+                                navController.navigate("${BEER_DETAILS.route}/${jsonBeer}")
+                            },
+                            onError = { showErrorMessage = true }
+                        )
+                    }
                 )
             }
             composable(
