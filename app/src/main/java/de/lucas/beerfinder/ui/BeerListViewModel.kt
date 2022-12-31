@@ -12,9 +12,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class BeerListViewModel @Inject constructor(
-    private val beerController: BeerController
-) : ViewModel() {
+class BeerListViewModel @Inject constructor(private val beerController: BeerController) :
+    ViewModel() {
 
     var beerList by mutableStateOf(mutableListOf<Beer>())
         private set

@@ -31,7 +31,12 @@ import de.lucas.beerfinder.ui.theme.Typography
 import kotlin.text.Typography.bullet
 
 @Composable
-fun BeerDetails(beer: Beer) {
+fun BeerDetails(
+    beer: Beer,
+    isFavorite: Boolean,
+    onClickFavorite: () -> Unit,
+    onClickBack: () -> Unit
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.background(LightBrown)
@@ -51,32 +56,55 @@ fun BeerDetails(beer: Beer) {
                 .background(Color.White)
                 .weight(3f)
         ) {
-            Column(
-                modifier = Modifier
-                    .padding(start = 32.dp, end = 32.dp, top = 16.dp, bottom = 16.dp)
-                    .verticalScroll(rememberScrollState())
-            ) {
-                Text(
-                    text = beer.name,
-                    style = MaterialTheme.typography.h6,
+            Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.padding(bottom = 8.dp)
-                )
-                Text(
-                    text = beer.tagline,
-                    style = Typography.caption,
-                    fontWeight = FontWeight.Light,
-                    modifier = Modifier.padding(bottom = 32.dp)
-                )
-                Text(
-                    text = beer.description,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-                Text(
-                    text = stringResource(id = R.string.brewed_since, beer.firstBrewed),
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-                ExpandableList(foodPairing = beer.foodPairing, ingredients = null)
-                ExpandableList(foodPairing = null, ingredients = beer.ingredients)
+                ) {
+                    IconButton(onClick = { onClickBack() }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_arrow_back),
+                            contentDescription = ""
+                        )
+                    }
+                    Spacer(modifier = Modifier.weight(1f))
+                    IconButton(onClick = {
+                        onClickFavorite()
+                    }) {
+                        Icon(
+                            painter = painterResource(id = if (isFavorite) R.drawable.ic_favorite_added else R.drawable.ic_not_favorite),
+                            contentDescription = ""
+                        )
+                    }
+                }
+                Column(
+                    modifier = Modifier
+                        .padding(start = 16.dp, end = 16.dp)
+                        .verticalScroll(rememberScrollState())
+                ) {
+
+                    Text(
+                        text = beer.name,
+                        style = MaterialTheme.typography.h6,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    Text(
+                        text = beer.tagline,
+                        style = Typography.caption,
+                        fontWeight = FontWeight.Light,
+                        modifier = Modifier.padding(bottom = 32.dp)
+                    )
+                    Text(
+                        text = beer.description,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                    Text(
+                        text = stringResource(id = R.string.brewed_since, beer.firstBrewed),
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                    ExpandableList(foodPairing = beer.foodPairing, ingredients = null)
+                    ExpandableList(foodPairing = null, ingredients = beer.ingredients)
+                }
             }
         }
     }

@@ -1,6 +1,7 @@
 package de.lucas.beerfinder.ui
 
-enum class NavItem(val route: String, val title: String, val isNavBackEnabled: Boolean = false) {
-    BEER_LIST("beer_list", "Beer List"),
-    BEER_DETAILS("beer_details", "Beer Details", true)
+enum class NavItem(val route: String, val title: String, val showTabBar: Boolean = true) {
+    BEER_LIST("beer_list", "Beers"),
+    BEER_FAVORITES("beer_favorites", "Favorites"),
+    BEER_DETAILS("beer_details", "Details", false)
 }
