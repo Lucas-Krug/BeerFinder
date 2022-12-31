@@ -82,7 +82,6 @@ fun BeerDetails(
                         .padding(start = 16.dp, end = 16.dp)
                         .verticalScroll(rememberScrollState())
                 ) {
-
                     Text(
                         text = beer.name,
                         style = MaterialTheme.typography.h6,
@@ -100,7 +99,7 @@ fun BeerDetails(
                     )
                     Text(
                         text = stringResource(id = R.string.brewed_since, beer.firstBrewed),
-                        modifier = Modifier.padding(bottom = 16.dp)
+                        modifier = Modifier.padding(bottom = 32.dp)
                     )
                     ExpandableList(foodPairing = beer.foodPairing, ingredients = null)
                     ExpandableList(foodPairing = null, ingredients = beer.ingredients)
@@ -125,7 +124,7 @@ private fun ExpandableList(foodPairing: List<String>?, ingredients: Ingredients?
                     easing = LinearOutSlowInEasing
                 )
             )
-            .padding(top = 16.dp),
+            .padding(bottom = 16.dp),
         true,
         shape = RoundedCornerShape(12.dp),
         backgroundColor = LightBrown,
