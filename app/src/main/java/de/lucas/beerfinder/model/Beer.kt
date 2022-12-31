@@ -1,10 +1,14 @@
 package de.lucas.beerfinder.model
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+@Entity(tableName = "beer_table")
 @Serializable
 data class Beer(
+    @PrimaryKey
     val id: Int,
     val name: String,
     val tagline: String,

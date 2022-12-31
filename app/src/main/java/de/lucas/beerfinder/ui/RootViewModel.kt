@@ -10,8 +10,7 @@ import javax.inject.Inject
 @HiltViewModel
 class RootViewModel @Inject constructor() : ViewModel() {
     var state by mutableStateOf(LoadingState.LOADING)
-    var title by mutableStateOf("")
-    var showBackNavButton by mutableStateOf(false)
+    var showTabBar by mutableStateOf(true)
 }
 
 enum class LoadingState {

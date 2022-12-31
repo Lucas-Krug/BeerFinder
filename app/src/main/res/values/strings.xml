@@ -11,4 +11,5 @@
     <string name="load_more">Load More</string>
     <string name="surprise_me">Surprise Me</string>
     <string name="random_title">Don\'t know what to try next?</string>
+    <string name="no_favorites">You have no favorite beers</string>
 </resources>
