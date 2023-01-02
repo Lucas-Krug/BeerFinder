@@ -27,6 +27,8 @@ object Versions {
 
     const val coil = "2.2.2"
 
+    const val ratingbar = "1.2.3"
+
     const val mockk = "1.13.2"
     const val mockServer = "4.10.0"
 

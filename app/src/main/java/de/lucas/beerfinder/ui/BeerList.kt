@@ -1,5 +1,6 @@
 package de.lucas.beerfinder.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -109,16 +110,29 @@ fun BeerItem(beer: Beer, onClickBeer: (beer: Beer) -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(16.dp)
         ) {
-            AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(beer.imageUrl)
-                    .crossfade(true)
-                    .build(),
-                placeholder = painterResource(R.drawable.ic_downloading),
-                error = painterResource(id = R.drawable.ic_no_image),
-                contentDescription = "",
-                modifier = Modifier.size(80.dp)
-            )
+            Box(Modifier.fillMaxWidth()) {
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(beer.imageUrl)
+                        .crossfade(true)
+                        .build(),
+                    placeholder = painterResource(R.drawable.ic_downloading),
+                    error = painterResource(id = R.drawable.ic_no_image),
+                    contentDescription = "",
+                    modifier = Modifier
+                        .size(80.dp)
+                        .align(Alignment.Center)
+                )
+                if (beer.rating > 0f) {
+                    Row(modifier = Modifier.align(Alignment.TopEnd)) {
+                        Text(text = beer.rating.toString().trim(), style = Typography.caption)
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_star),
+                            contentDescription = ""
+                        )
+                    }
+                }
+            }
             Text(
                 text = beer.name,
                 textAlign = TextAlign.Center,
@@ -153,6 +167,8 @@ fun LoadingIndicator() {
     }
 }
 
+fun String.trim(): String = if (this.last() == '0') this.first().toString() else this
+
 @Preview
 @Composable
 fun PreviewBeerList() {
@@ -170,7 +186,8 @@ fun PreviewBeerList() {
                     hops = listOf(),
                     yeast = ""
                 ),
-                foodPairing = listOf()
+                foodPairing = listOf(),
+                rating = 1.0f
             )
         ),
         state = FINISHED,

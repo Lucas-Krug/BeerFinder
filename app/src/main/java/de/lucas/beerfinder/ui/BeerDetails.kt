@@ -23,6 +23,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.gowtham.ratingbar.RatingBar
+import com.gowtham.ratingbar.RatingBarConfig
+import com.gowtham.ratingbar.RatingBarStyle
+import com.gowtham.ratingbar.StepSize
 import de.lucas.beerfinder.R
 import de.lucas.beerfinder.model.Beer
 import de.lucas.beerfinder.model.Beer.Ingredients
@@ -35,8 +39,10 @@ fun BeerDetails(
     beer: Beer,
     isFavorite: Boolean,
     onClickFavorite: () -> Unit,
+    onClickRating: (Float) -> Unit,
     onClickBack: () -> Unit
 ) {
+    var rating by remember { mutableStateOf(beer.rating) }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.background(LightBrown)
@@ -99,6 +105,19 @@ fun BeerDetails(
                     )
                     Text(
                         text = stringResource(id = R.string.brewed_since, beer.firstBrewed),
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                    RatingBar(
+                        value = rating,
+                        config = RatingBarConfig()
+                            .stepSize(StepSize.HALF)
+                            .style(RatingBarStyle.HighLighted),
+                        onValueChange = {
+                            rating = it
+                        },
+                        onRatingChanged = {
+                            onClickRating(it)
+                        },
                         modifier = Modifier.padding(bottom = 32.dp)
                     )
                     ExpandableList(foodPairing = beer.foodPairing, ingredients = null)
