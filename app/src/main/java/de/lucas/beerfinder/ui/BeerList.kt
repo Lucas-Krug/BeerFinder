@@ -1,7 +1,9 @@
 package de.lucas.beerfinder.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -9,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -41,39 +44,39 @@ fun BeerList(
                     contentPadding = PaddingValues(all = 8.dp),
                     content = {
                         items(beers.size) { index ->
-                            if (index == beers.lastIndex) {
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    modifier = Modifier.fillMaxWidth()
+                            BeerItem(beer = beers[index], onClickBeer)
+                        }
+                        item(
+                            span = { GridItemSpan(maxCurrentLineSpan) }
+                        ) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Button(
+                                    onClick = onClickLoad,
+                                    shape = RoundedCornerShape(50),
+                                    modifier = Modifier
+                                        .padding(top = 16.dp, bottom = 16.dp)
+                                        .height(40.dp)
+                                        .width(124.dp)
                                 ) {
-                                    BeerItem(beer = beers[index], onClickBeer)
-                                    Button(
-                                        onClick = onClickLoad,
-                                        shape = RoundedCornerShape(50),
-                                        modifier = Modifier
-                                            .padding(top = 16.dp, bottom = 16.dp)
-                                            .height(40.dp)
-                                            .width(124.dp)
-                                    ) {
-                                        Text(text = stringResource(id = R.string.load_more))
-                                    }
-                                    Text(
-                                        text = stringResource(id = R.string.random_title),
-                                        style = Typography.caption
-                                    )
-                                    Button(
-                                        onClick = onClickRandom,
-                                        shape = RoundedCornerShape(50),
-                                        modifier = Modifier
-                                            .padding(top = 4.dp, bottom = 16.dp)
-                                            .height(40.dp)
-                                            .width(124.dp)
-                                    ) {
-                                        Text(text = stringResource(id = R.string.surprise_me))
-                                    }
+                                    Text(text = stringResource(id = R.string.load_more))
                                 }
-                            } else {
-                                BeerItem(beer = beers[index], onClickBeer)
+                                Text(
+                                    text = stringResource(id = R.string.random_title),
+                                    style = Typography.caption
+                                )
+                                Button(
+                                    onClick = onClickRandom,
+                                    shape = RoundedCornerShape(50),
+                                    modifier = Modifier
+                                        .padding(top = 4.dp, bottom = 16.dp)
+                                        .height(40.dp)
+                                        .width(124.dp)
+                                ) {
+                                    Text(text = stringResource(id = R.string.surprise_me))
+                                }
                             }
                         }
                     }
@@ -134,12 +137,19 @@ fun BeerItem(beer: Beer, onClickBeer: (beer: Beer) -> Unit) {
 
 @Composable
 fun LoadingIndicator() {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+    Box(
+        Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.1f))
+            .pointerInput(Unit) {}
     ) {
-        CircularProgressIndicator(color = Color.Black)
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            CircularProgressIndicator(color = Color.Black)
+        }
     }
 }
 

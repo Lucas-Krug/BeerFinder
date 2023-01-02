@@ -96,7 +96,9 @@ fun Root() {
                     onError = { showErrorMessage = true },
                     onClickRandom = {
                         model.fetchRandomBeer(
+                            onLoading = { rootViewModel.state = LoadingState.LOADING },
                             onFinished = { beer ->
+                                rootViewModel.state = LoadingState.FINISHED
                                 val jsonBeer =
                                     URLEncoder.encode(
                                         Json.encodeToString(beer),
@@ -105,7 +107,10 @@ fun Root() {
                                         .replace("+", " ")
                                 navController.navigate("${BEER_DETAILS.route}/${jsonBeer}")
                             },
-                            onError = { showErrorMessage = true }
+                            onError = {
+                                rootViewModel.state = LoadingState.ERROR
+                                showErrorMessage = true
+                            }
                         )
                     }
                 )
