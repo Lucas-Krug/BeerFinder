@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.lucas.beerfinder.model.Beer
 import de.lucas.beerfinder.model.DatabaseController
+import de.lucas.beerfinder.model.Rating
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -32,6 +33,13 @@ class BeerDetailsViewModel @Inject constructor(private val dbController: Databas
     fun isFavorite(id: Int) {
         viewModelScope.launch {
             isFavorite = dbController.isBeerFavorite(id)
+        }
+    }
+
+    fun setRating(rating: Rating, beer: Beer) {
+        viewModelScope.launch {
+            dbController.setRating(rating)
+            if (isFavorite) dbController.addBeer(beer.copy(rating = rating.rating))
         }
     }
 }

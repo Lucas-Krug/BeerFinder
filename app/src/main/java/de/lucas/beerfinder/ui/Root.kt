@@ -20,6 +20,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import de.lucas.beerfinder.R
 import de.lucas.beerfinder.model.Beer
+import de.lucas.beerfinder.model.Rating
 import de.lucas.beerfinder.ui.NavItem.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -32,6 +33,8 @@ import java.net.URLEncoder
 fun Root() {
     val navController = rememberNavController()
     val rootViewModel: RootViewModel = hiltViewModel()
+    val beerListViewModel: BeerListViewModel = hiltViewModel()
+    val favoriteViewModel: BeerFavoriteViewModel = hiltViewModel()
     val context = LocalContext.current
     var showErrorMessage by remember { mutableStateOf(false) }
     val coroutineScope: CoroutineScope = rememberCoroutineScope()
@@ -66,12 +69,11 @@ fun Root() {
             startDestination = BEER_LIST.route,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(BEER_LIST.route) { stackEntry ->
+            composable(BEER_LIST.route) {
                 rootViewModel.showTabBar = BEER_LIST.showTabBar
-                val model: BeerListViewModel = hiltViewModel(stackEntry)
-                LaunchedEffect(model) {
-                    if (model.beerList.isEmpty()) {
-                        model.fetchBeerList(
+                LaunchedEffect(beerListViewModel) {
+                    if (beerListViewModel.beerList.isEmpty()) {
+                        beerListViewModel.fetchBeerList(
                             onLoading = { rootViewModel.state = LoadingState.LOADING },
                             onFinished = { rootViewModel.state = LoadingState.FINISHED },
                             onError = { rootViewModel.state = LoadingState.ERROR }
@@ -79,7 +81,7 @@ fun Root() {
                     }
                 }
                 BeerList(
-                    beers = model.beerList,
+                    beers = beerListViewModel.beerList,
                     state = rootViewModel.state,
                     onClickBeer = { beer ->
                         val jsonBeer =
@@ -87,7 +89,7 @@ fun Root() {
                         navController.navigate("${BEER_DETAILS.route}/${jsonBeer}")
                     },
                     onClickLoad = {
-                        model.fetchBeerList(
+                        beerListViewModel.fetchBeerList(
                             onLoading = { rootViewModel.state = LoadingState.LOADING },
                             onFinished = { rootViewModel.state = LoadingState.FINISHED },
                             onError = { rootViewModel.state = LoadingState.ERROR }
@@ -95,7 +97,7 @@ fun Root() {
                     },
                     onError = { showErrorMessage = true },
                     onClickRandom = {
-                        model.fetchRandomBeer(
+                        beerListViewModel.fetchRandomBeer(
                             onLoading = { rootViewModel.state = LoadingState.LOADING },
                             onFinished = { beer ->
                                 rootViewModel.state = LoadingState.FINISHED
@@ -150,25 +152,30 @@ fun Root() {
                                 }
                             }
                         },
+                        onClickRating = { rating ->
+                            model.setRating(Rating(beer.id, rating), beer)
+                            beerListViewModel.updateListRating(Rating(beer.id, rating))
+                            if (model.isFavorite) {
+                                favoriteViewModel.updateListRating(Rating(beer.id, rating))
+                            }
+                        },
                         onClickBack = { navController.popBackStack() }
                     )
                 }
             }
             composable(BEER_FAVORITES.route) {
                 rootViewModel.showTabBar = BEER_FAVORITES.showTabBar
-                val model: BeerFavoriteViewModel = hiltViewModel()
-                LaunchedEffect(model) {
-                    model.getFavorites()
+                LaunchedEffect(favoriteViewModel) {
+                    favoriteViewModel.getFavorites()
                 }
                 FavoriteBeers(
-                    beers = model.favoriteBeers,
+                    beers = favoriteViewModel.favoriteBeers,
                     onClickBeer = { beer ->
                         val jsonBeer =
                             URLEncoder.encode(
                                 Json.encodeToString(beer),
                                 "UTF-8"
-                            )
-                                .replace("+", " ")
+                            ).replace("+", " ")
                         navController.navigate("${BEER_DETAILS.route}/${jsonBeer}")
                     }
                 )

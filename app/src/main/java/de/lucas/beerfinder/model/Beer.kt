@@ -19,7 +19,8 @@ data class Beer(
     val imageUrl: String?,
     val ingredients: Ingredients,
     @SerialName("food_pairing")
-    val foodPairing: List<String>
+    val foodPairing: List<String>,
+    val rating: Float = 0f
 ) {
     @Serializable
     data class Ingredients(

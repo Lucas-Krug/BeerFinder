@@ -66,4 +66,8 @@ object AppModule {
     @Singleton
     @Provides
     fun provideBeerDao(db: BeerDb) = db.beerDao()
+
+    @Singleton
+    @Provides
+    fun provideRatingDao(db: BeerDb) = db.ratingDao()
 }

@@ -80,6 +80,8 @@ dependencies {
 
     implementation("io.coil-kt:coil-compose:${Versions.coil}")
 
+    implementation("io.github.a914-gowtham:compose-ratingbar:${Versions.ratingbar}")
+
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:${Versions.compose}")
     debugImplementation("androidx.compose.ui:ui-test-manifest:${Versions.compose}")
 

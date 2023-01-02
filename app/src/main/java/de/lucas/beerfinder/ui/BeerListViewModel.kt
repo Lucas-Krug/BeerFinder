@@ -8,18 +8,22 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.lucas.beerfinder.model.Beer
 import de.lucas.beerfinder.model.BeerController
+import de.lucas.beerfinder.model.DatabaseController
+import de.lucas.beerfinder.model.Rating
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class BeerListViewModel @Inject constructor(private val beerController: BeerController) :
+class BeerListViewModel @Inject constructor(
+    private val beerController: BeerController,
+    private val dbController: DatabaseController
+) :
     ViewModel() {
 
-    var beerList by mutableStateOf(mutableListOf<Beer>())
+    var beerList by mutableStateOf(listOf<Beer>())
         private set
 
-    var page by mutableStateOf(1)
-        private set
+    private var page by mutableStateOf(1)
 
     fun fetchBeerList(
         onLoading: () -> Unit,
@@ -37,9 +41,11 @@ class BeerListViewModel @Inject constructor(private val beerController: BeerCont
                             onFinished()
                         },
                         onError = onError
-                    )?.toMutableList() ?: mutableListOf()
+                    )?.map { beer ->
+                        beer.copy(rating = dbController.hasRating(beer.id)?.rating ?: 0f)
+                    } ?: listOf()
             } else {
-                val newBeerList = beerController.fetchBeerList(
+                val newBeerLists = beerController.fetchBeerList(
                     page = page,
                     onLoading = onLoading,
                     onFinished = { nextPage ->
@@ -47,17 +53,38 @@ class BeerListViewModel @Inject constructor(private val beerController: BeerCont
                         onFinished()
                     },
                     onError = onError
-                )?.toMutableList() ?: mutableListOf()
-                beerList.addAll(newBeerList)
+                )?.map { beer ->
+                    beer.copy(rating = dbController.hasRating(beer.id)?.rating ?: 0f)
+                } ?: listOf()
+                beerList = beerList + newBeerLists
             }
         }
     }
 
-    fun fetchRandomBeer(onLoading: () -> Unit, onFinished: (Beer) -> Unit, onError: () -> Unit) {
+    fun updateListRating(rating: Rating) {
+        val updatedBeerList = beerList.map { beer ->
+            if (beer.id == rating.id) beer.copy(rating = rating.rating) else beer
+        }
+        beerList = updatedBeerList.toMutableList()
+    }
+
+    fun fetchRandomBeer(
+        onLoading: () -> Unit,
+        onFinished: (Beer) -> Unit,
+        onError: () -> Unit
+    ) {
         viewModelScope.launch {
             beerController.fetchRandomBeer(
                 onLoading = onLoading,
-                onFinished = { beer -> onFinished(beer) },
+                onFinished = { beer ->
+                    viewModelScope.launch {
+                        onFinished(
+                            beer.copy(
+                                rating = dbController.hasRating(beer.id)?.rating ?: 0f
+                            )
+                        )
+                    }
+                },
                 onError = onError
             )
         }
